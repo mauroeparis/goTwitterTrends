@@ -1,10 +1,10 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"net/http"
-	
+	"encoding/json"
+
 	"github.com/dghubble/go-twitter/twitter"
 	"github.com/dghubble/oauth1"
 	"github.com/tkanos/gonfig"
@@ -20,9 +20,9 @@ type Configuration struct {
 }
 
 type custom_trend struct {
-	name string `json:"name"`
+	Name string `json:"name"`
 	URL string `json:"url"`
-	tweetVolume int64 `json:"tweet_volume"`
+	TweetVolume int64 `json:"tweet_volume"`
 }
 
 func getTwitterClient() *twitter.Client {
@@ -55,7 +55,7 @@ func getTrends() []custom_trend {
 
 	var cus_trends = make([]custom_trend, 0)
 
-	for _, v := range trends[0].Trends { 
+	for _, v := range trends[0].Trends {
 		if v.TweetVolume > 0 {
 			pop_trend := custom_trend{ v.Name, v.URL, v.TweetVolume }
 			cus_trends = append(cus_trends, pop_trend)
@@ -67,24 +67,9 @@ func getTrends() []custom_trend {
 
 func get(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-
 	trends := getTrends()
-	var data []string
-
-	for i, t := range trends { 
-		res := fmt.Sprintf(`{
-			"name": "%v",
-			"URL": "%v",
-			"tweetVolume": "%v"
-		},`, t.name, t.URL, t.tweetVolume)
-		if i==len(trends)-1 {
-			res = res[:len(res)-1]
-		}
-		data = append(data, res)
-	}
-	w.WriteHeader(http.StatusOK)
-	response := fmt.Sprintf(`{"message": %v}`, data)
-    w.Write([]byte(response))
+	response, _ := json.Marshal(trends)
+    w.Write(response)
 }
 
 func main() {
