@@ -28,7 +28,7 @@ func max(a, b int) int {
     return b
 }
 
-func trendsToBoxes(trends []custom_trend) []tweet_box_type {
+func trendsToBoxes(trends []custom_trend, max_width int) []tweet_box_type {
 	var ratio float64
 
 	var maxTwVol int
@@ -36,7 +36,7 @@ func trendsToBoxes(trends []custom_trend) []tweet_box_type {
 		maxTwVol = max(int(t.TweetVolume), maxTwVol)
 	}
 
-	ratio = 1440.0 / float64(maxTwVol)
+	ratio = float64(max_width) / float64(maxTwVol)
 	t_boxes := make([]tweet_box_type, 0)
 
 	for _, t := range trends {
