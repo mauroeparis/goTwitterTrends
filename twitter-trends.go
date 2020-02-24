@@ -1,18 +1,11 @@
 package main
 
 import (
-	"encoding/json"
-	"log"
-	"net/http"
-	"sort"
 	"time"
 
 	"github.com/dghubble/go-twitter/twitter"
 	"github.com/dghubble/oauth1"
-	"github.com/gorilla/handlers"
-	"github.com/gorilla/mux"
 	"github.com/patrickmn/go-cache"
-	"github.com/tkanos/gonfig"
 )
 
 type Configuration struct {
@@ -70,33 +63,8 @@ func getTrends() []custom_trend {
 				cus_trends = append(cus_trends, pop_trend)
 			}
 		}
-		sort.Slice(cus_trends, func(i, j int) bool {
-			return cus_trends[i].TweetVolume > cus_trends[j].TweetVolume
-		})
+
 		cach.Set("cus_trends", cus_trends, cache.DefaultExpiration)
 	}
 	return cus_trends
-}
-
-func get(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	trends := getTrends()
-	response, _ := json.Marshal(trends)
-    w.Write(response)
-}
-
-func main() {
-	gonfig.GetConf("./config.json", &configuration)
-	r := mux.NewRouter()
-	r.HandleFunc("/", get).Methods(http.MethodGet)
-
-	headersOk := handlers.AllowedHeaders([]string{"X-Requested-With"})
-	originsOk := handlers.AllowedOrigins([]string{`*`})
-	methodsOk := handlers.AllowedMethods(
-		[]string{"GET", "HEAD", "POST", "PUT", "OPTIONS"},
-	)
-    log.Fatal(http.ListenAndServe(
-		":8080",
-		handlers.CORS(originsOk, headersOk, methodsOk)(r)),
-	)
 }
