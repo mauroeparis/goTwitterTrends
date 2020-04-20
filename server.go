@@ -4,6 +4,7 @@ import (
 	"log"
 	"encoding/json"
 	"net/http"
+	"html/template"
 
 	"github.com/gorilla/mux"
 	"github.com/rs/cors"
@@ -34,19 +35,17 @@ func post(w http.ResponseWriter, r *http.Request) {
 }
 
 func get(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	
-	trends := getTrends()
-	trends_boxes := trendsToBoxes(trends, 1440)
-	potpack(trends_boxes)
+	tmpl := template.Must(template.ParseFiles("index.html"))
 
-	response, _ := json.Marshal(trends_boxes)
-    w.Write(response)
+	tmpl.Execute(w, "")
 }
 
 func main() {
 	gonfig.GetConf("./config.json", &configuration)
 	r := mux.NewRouter()
+
+	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
+
 	r.HandleFunc("/", post).Methods(http.MethodPost)
 	r.HandleFunc("/", get).Methods(http.MethodGet)
 	handler := cors.Default().Handler(r)
