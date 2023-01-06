@@ -28,4 +28,4 @@ The `/` route will get a POST with your computers width and return something lik
 ```
 
 This gives all the data needed to position all the Trending Topic containters. The width and height change depending on how many people are tweeting about this.
-go to the (htmlTwitterTrends)[https://github.com/mauroeparis/htmlTwitterTrends] repo in order to see how it looks.
+go to the [htmlTwitterTrends](https://github.com/mauroeparis/htmlTwitterTrends) repo in order to see how it looks.
